@@ -1,6 +1,6 @@
 const WIDTH = 15;
 const HEIGHT = 15;
-class RectLabyrinth implements LabyrinthImp {
+class RectLabyrinth {
 
     private row: number;
     private col: number;

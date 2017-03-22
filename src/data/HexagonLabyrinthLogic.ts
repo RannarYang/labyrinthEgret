@@ -1,59 +1,43 @@
-class HexagonLabyrinth implements LabyrinthImp{
-	private _row: number;
-	private _col: number;
-	private _linkArr :boolean[] = [];
-	private _dataArr: number[][][] = [];
-	public constructor(row, col) {
-		console.log('create HexagonLabyrinth');
-		this._row = row;
-		this._col = col;
-		this.init();
-	}
-	public getEntrance() {
-
-	} 
-	// 获取迷宫出口
-	public getExit() {
-
-	}
-	// 生成迷宫的算法
-	public createLabyrinth() {
-
-	}
-	// 作弊
-	public getLabyrinthLine() {
-
-	}
-	public getLabyArr() {
-		return this._dataArr;
-	}
-	private init() {
-		this.initLabyrinthArr();
-		this.makeLink();
-	}
-	private initLabyrinthArr() {
-		// console.log('initLabyrinthArr');
-		let row = this._row;
-		let col = this._col;
-		let count = row * col;
-		let linkArr = this._linkArr = [];
-		for (let i = 0; i < count; i++) {
-			linkArr[i] = false; //全部都处于不连通状态
-		}
-		let dataArr = this._dataArr = [];
-		for (let i = 0; i < row; i++) {
-			dataArr[i] = [];
-			for(let j = 0; j < col; j++) {
-				dataArr[i][j] = [0, 0, 0, 0, 0, 0];
+class HexagonLabyrinthLogic {
+	private static _row: number;
+	private static _col: number;
+	private static _labyArr = [];
+	public static getNextCanMoveNum(num) : number[]{
+		let canMoveNumArr = [];
+		let labyArrExit = GameData.labyArr[num];
+		let col = GameData.col;
+		let off1 = [ - col + 1, +1, + col, + col -1  ,-1, - col];
+		for (let i = 0; i < labyArrExit.length; i++) {
+			if ((num === 0 && i === 4) || (num === GameData.labyArr.length - 1 && i === 1)){
+				continue;
+			}
+			if (labyArrExit[i] === 1) {
+				let canMoveNum = num + off1[i] ;
+				canMoveNumArr.push(canMoveNum);
 			}
 		}
+		return canMoveNumArr;
 	}
-	private makeLink() {
-		// console.log('makeLink');
+	public static createLabyrinth(row, col) {
+		this._row = row;
+		this._col = col;
+		this.initLabyrinthArr();
+		this.makeLink();
+		this.setEntranceExit();
+		return this._labyArr;
+	}
+
+	private static initLabyrinthArr() {
+		let count = Utils.getHexagonCount(this._row, this._col);
+		let labyArr = this._labyArr = [];
+		for (let i = 0; i < count; i++) {
+			labyArr[i] = this._labyArr[i] = [0, 0, 0, 0, 0, 0];
+		}
+	}
+	private static makeLink() {
 		let row = this._row;
 		let col = this._col;
-		let count = row * col;
-		
+		let count = Utils.getHexagonCount(this._row, this._col);
 		let acc = [];
         let noacc = [];
 		for ( let i = 0; i < count; i++ ) {
@@ -66,18 +50,18 @@ class HexagonLabyrinth implements LabyrinthImp{
 		let pos = Math.floor(Math.random() * count);
 		noacc[pos] = 1;
 		acc.push(pos);
-
 		while(acc.length < count) {
-			let pr1 = pos / c | 0;
-			let pc1 = pos % c;
+			let pr1 = Utils.getHexagonRow(pos, this._col);
+			let pc1 = Utils.getHexagonCol(pos, this._col);
 
 			let arr = [];
 			for (let i = 0; i < off1.length; i++) {
 				arr[i] = off1[i] + pos;
 			}
-			arr = arr.filter(function(val, index) {
-				let pr = val / c | 0;
-				let pc = val % c;
+			var self = this;
+			arr = arr.filter((val, index)=> {
+				let pr = Utils.getHexagonRow(val, this._col);
+				let pc = Utils.getHexagonCol(val, this._col);
 				return (index === 0 && (pos - col + 1) >= 0 && pr === pr1 - 1
 					|| index === 1 && (pos + 1) < count && pr === pr1  
 					|| index === 2 && (pos + col) < count && pr === pr1 + 1
@@ -86,15 +70,14 @@ class HexagonLabyrinth implements LabyrinthImp{
 					|| index === 5 && (pos - col) >= 0 && pr === pr1 - 1)
 					&& noacc[val] === 0;
 			});
-
 			if ( arr.length <= 0 ) {
                 pos = acc[ Math.floor(Math.random() * acc.length) ];
-            }else {
+            } else {
 				let ls = arr[Math.floor(Math.random() * arr.length)];
 				let offPos = off1.indexOf(ls - pos);
 				pos = ls;
-				let pr2 = pos / c | 0;
-				let pc2 = pos % c;
+				let pr2 = Utils.getHexagonRow(pos, this._col);
+				let pc2 = Utils.getHexagonCol(pos, this._col);
                 // 相邻空单元中间的位置置0
 				let open = 0;
 				if (offPos === 0) {
@@ -110,12 +93,15 @@ class HexagonLabyrinth implements LabyrinthImp{
 				} else if (offPos === 5) {
 					open = 2;
 				}
-                this._dataArr[ pr1 ][ pc1 ][ offPos ] = 1;
-                this._dataArr[ pr2 ][ pc2 ][ open ] = 1;
-                
+				this._labyArr[Utils.getHexagonPos(pr1, pc1, this._col)][offPos] = 1;
+				this._labyArr[Utils.getHexagonPos(pr2, pc2, this._col)][open] = 1;
                 noacc[pos] = 1;
                 acc.push(pos);
             }
 		}
+	}
+	private static setEntranceExit() {
+		this._labyArr[0][4] = 1;
+		this._labyArr[this._labyArr.length - 1][1] = 1;
 	}
 }

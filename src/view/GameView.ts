@@ -1,74 +1,88 @@
 class GameView extends eui.Component{
+	private _hexagonLabyrinthView: HexagonLabyrinthView;
 	public constructor() {
 		super();
 		this.init();
 	}
-	private init() {
-		// let gShape = new egret.Shape();
-		// this.addChild(gShape);
-        // let graphics = gShape.graphics;
-        // graphics.beginFill(0xffff00);
-        // for (let i = 0; i < GameData.labyArr.length; i++) {
-        //     for ( let j = 0; j < GameData.labyArr[i].length; j++) {
-        //         if ( GameData.labyArr[i][j] === 1) {
-        //                 graphics.drawRect(i * WIDTH, j * HEIGHT, WIDTH, HEIGHT);
-        //         }
-        //     }
-        // }
-		// graphics.endFill();
-
-		console.log('================================', GameData.labyArr)
-		let gShape = new egret.Shape();
-		gShape.x = 100;
-		gShape.y = 100;
-		this.addChild(gShape);
-		let graphics = gShape.graphics;
-
-		// 六边形
-		let col = 10;
-		let row = 10;
-		let r = 20;
-		let delta = 2 * Math.PI/6;
-		for (let i = 0; i < row; i++) {
-			for (let j = 0; j < col; j++) {
-				let drawData = GameData.labyArr[i][j];
-				this.drawPolygon(graphics, 6, (j * r * 2 + i * r) * Math.sin(delta) ,  i * r * 3 / 2, r, null, null, drawData );
-			}
+	public newHexagonLabyrinthView() {
+		if(this._hexagonLabyrinthView) {
+			this.removeChild(this._hexagonLabyrinthView);
 		}
-
-		// 三角形
-		// let col = 6;
-		// let row = 6;
-		// let r = 50;
-		// let delta = 2 * Math.PI/6;
-		// for (let i = 0; i < col; i++) {
-		// 	for (let j = 0; j < row; j++) {
-		// 		if ( j % 2 === 1) {
-		// 			this.drawPolygon(graphics, 3, i * r * Math.sin(delta) * 2 + r * Math.sin(delta) ,  j * r * 3 / 2, r );
-		// 		} else {
-		// 			this.drawPolygon(graphics, 3, 2 * r * Math.sin(delta) + i * r * Math.sin(delta) * 2,  j * r * 3 / 2, r );
-		// 		}
-				
-		// 	}
-		// }
-		
+		let hexagonLabyrinthView = this._hexagonLabyrinthView = new HexagonLabyrinthView();
+		this._hexagonLabyrinthView.addEventListener(HexagonLabyrinthViewEvent.SUCCESS, this.success, this);
+		this.addChild(hexagonLabyrinthView);
 	}
-	private drawPolygon(graphics: egret.Graphics, n, x, y, r, angle = 0, counterclockwise = false, drawData = []) {
-		graphics.lineStyle(3, 0x000000);
-		graphics.moveTo(x + r * Math.sin(angle), y - r * Math.cos(angle));
-		
-		let delta = 2 * Math.PI/n;
-		for(var i = 0; i < n; i++) {
-			angle += counterclockwise ? - delta: delta;
-			if (drawData[i] === 1) {
-				graphics.endFill();
-				graphics.moveTo(x + r * Math.sin(angle), y - r * Math.cos(angle));
-			} else {
-				graphics.lineTo(x + r * Math.sin(angle), y - r * Math.cos(angle));
-				
-			}
-			
-		}
+	private init() {
+		this.newHexagonLabyrinthView();
+
+		this.addEntranceExit();
+
+		let replayBtn = this.createBtn("重玩", 240, 1020);
+		this.addChild(replayBtn);
+		replayBtn.addEventListener(egret.TouchEvent.TOUCH_TAP, this.tap_replayBtn, this);
+
+		let nextBtn = this.createBtn("下一关", 430, 1020);
+		this.addChild(nextBtn);
+		nextBtn.addEventListener(egret.TouchEvent.TOUCH_TAP, this.tap_nextBtn, this);
+
+		let showLineBtn = this.createBtn("提示", 50, 1020);
+		this.addChild(showLineBtn);
+		showLineBtn.addEventListener(egret.TouchEvent.TOUCH_TAP, this.tap_tipsBtn, this);
+	}
+	private createBtn(text, x, y) :eui.Component{
+		let btn = new eui.Component();
+		let btnWidth = 170;
+		let btnHeight = 80;
+		btn.x = x;
+		btn.y = 1020;
+		let btnShap = new egret.Shape();
+		btn.addChild(btnShap);
+		let graphics = btnShap.graphics;
+		graphics.beginFill(0xF9B2A5, 1);
+		graphics.drawRoundRect(0, 0, btnWidth, btnHeight, 20);
 		graphics.endFill();
+
+		let btnText = new eui.Label(text);
+		btnText.size = 40;
+		btnText.textAlign = 'center';
+		btnText.verticalAlign = 'middle';
+		btnText.width = btnWidth;
+		btnText.height = btnHeight;
+		btn.addChild(btnText);
+		return btn;
+	}
+	private addEntranceExit() {
+		console.log('addEntrance');
+		let entranceText = new eui.Label('入口 >');
+		entranceText.y = 85;
+		entranceText.textColor = 0xff0000;
+		entranceText.size = 25;
+		this.addChild(entranceText);
+
+		let exitText = new eui.Label('出口 >');
+		exitText.x = 560;
+		exitText.y = 945;
+		exitText.textColor = 0xff0000;
+		exitText.size = 25;
+		this.addChild(exitText);
+	}
+	private tap_tipsBtn() {
+		console.log('tap_tipsBtn');
+		let gve: GameViewEvent = new GameViewEvent(GameViewEvent.TAP_TIPS);
+		this.dispatchEvent(gve);
+	}
+	private tap_replayBtn() {
+		console.log('replay');
+		let gve: GameViewEvent = new GameViewEvent(GameViewEvent.TAP_REPLAY);
+		this.dispatchEvent(gve);
+	}
+	private tap_nextBtn() {
+		console.log('next');
+		let gve: GameViewEvent = new GameViewEvent(GameViewEvent.TAP_NEXT);
+		this.dispatchEvent(gve);
+	}
+	private success() {
+		let gve: GameViewEvent = new GameViewEvent(GameViewEvent.SUCCESS);
+		this.dispatchEvent(gve);
 	}
 }

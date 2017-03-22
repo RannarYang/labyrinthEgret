@@ -1,9 +1,14 @@
 class GameData {
-	private static _labyrinth: LabyrinthImp;
 	public static labyArr;
+	public static row: number;
+	public static col: number;
+	public static gameType: string = 'hexagon';
+	public static r: number = 30;
+	public static stageW: number;
+	public static stageH: number;
 	public static initData() {
-		// console.log('initData');
-		this._labyrinth = LabyrinthFactory.createLabyrinth('hexagon');
-		GameData.labyArr = this._labyrinth.getLabyArr();
+		GameData.labyArr = [];
+		GameData.stageW = 640;
+		GameData.stageH = 1136;
 	}
 }
