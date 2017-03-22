@@ -11,7 +11,6 @@ class SuccessView extends eui.Component{
 		this.visible = false;
 	}
 	private init() {
-		console.log('init: =========');
 		let cover = new egret.Shape();
 		cover.graphics.beginFill(0xA7E8E3, 0.7);
 		cover.graphics.drawRect(0, 0, GameData.stageW, GameData.stageH);

@@ -12,6 +12,9 @@ class GameView extends eui.Component{
 		this._hexagonLabyrinthView.addEventListener(HexagonLabyrinthViewEvent.SUCCESS, this.success, this);
 		this.addChild(hexagonLabyrinthView);
 	}
+	public showTips() {
+		this._hexagonLabyrinthView.showTips();
+	}
 	private init() {
 		this.newHexagonLabyrinthView();
 
@@ -52,9 +55,8 @@ class GameView extends eui.Component{
 		return btn;
 	}
 	private addEntranceExit() {
-		console.log('addEntrance');
 		let entranceText = new eui.Label('入口 >');
-		entranceText.y = 85;
+		entranceText.y = 50;
 		entranceText.textColor = 0xff0000;
 		entranceText.size = 25;
 		this.addChild(entranceText);
@@ -67,17 +69,14 @@ class GameView extends eui.Component{
 		this.addChild(exitText);
 	}
 	private tap_tipsBtn() {
-		console.log('tap_tipsBtn');
 		let gve: GameViewEvent = new GameViewEvent(GameViewEvent.TAP_TIPS);
 		this.dispatchEvent(gve);
 	}
 	private tap_replayBtn() {
-		console.log('replay');
 		let gve: GameViewEvent = new GameViewEvent(GameViewEvent.TAP_REPLAY);
 		this.dispatchEvent(gve);
 	}
 	private tap_nextBtn() {
-		console.log('next');
 		let gve: GameViewEvent = new GameViewEvent(GameViewEvent.TAP_NEXT);
 		this.dispatchEvent(gve);
 	}

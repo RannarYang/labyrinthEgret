@@ -35,7 +35,7 @@ class GameLogic {
 		this._gameView.newHexagonLabyrinthView();
 	}
 	private tap_tips() {
-
+		this._gameView.showTips();
 	}
 	private tap_next() {
 		this.createLevel();

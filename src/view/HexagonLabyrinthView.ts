@@ -1,12 +1,20 @@
 class HexagonLabyrinthView extends eui.Component {
 	private nowStateShape: egret.Shape;
 	private clickShapeArr = [];
+	private tipsView: TipsView;
 	private canTouch = true;
+	private isShowTips = false;
 	public constructor() {
 		super();
 		this.init();
 	}
+	public showTips() {
+		this.isShowTips = true;
+		let path = HexagonLabyrinthLogic.getShortestPath(GameData.nowState);
+		this.tipsView.showTips(path);
+	}
 	private init() {
+		this.isShowTips = false;
 		// add hexagonLabyrinth line
 		let gShape = new egret.Shape();
 		gShape.x = 100;
@@ -24,6 +32,8 @@ class HexagonLabyrinthView extends eui.Component {
 			Utils.drawPolygon(graphics, 6, (j * r * 2 + xMul * r) * Math.sin(delta) ,  i * r * 3 / 2, r, null, null, 0x00B3E2, null,drawData );
 		}
 
+		this.tipsView = new TipsView();
+		this.addChild(this.tipsView)
 		// add a click area
 		let clickShape = new ClickShape(0);
 		this.addChild(clickShape);
@@ -32,6 +42,7 @@ class HexagonLabyrinthView extends eui.Component {
 
 		// add now state
 		let nowStateShape = this.nowStateShape = new egret.Shape();
+		nowStateShape.x = -50;
 		this.addChild(nowStateShape);
 		Utils.drawPolygon1(nowStateShape.graphics, 3, 100 ,  100, 10 );
 
@@ -44,6 +55,13 @@ class HexagonLabyrinthView extends eui.Component {
 		}
 		this.canTouch = false;
 		let num = evt.currentTarget.num;
+
+		// 设置GameData的nowState
+		GameData.nowState = num;
+		if (this.isShowTips) {
+			let path = HexagonLabyrinthLogic.getShortestPath(GameData.nowState);
+			this.tipsView.showTips(path);
+		}
 
 		var tw:egret.Tween = egret.Tween.get(this.nowStateShape);
 		tw.to({x: evt.currentTarget.centerX, y: evt.currentTarget.centerY}, 200).call(()=>{
