@@ -2,7 +2,7 @@ class SuccessView extends eui.Component{
 	public constructor() {
 		super();
 		this.init();
-		// this.hide();
+		this.hide();
 	}
 	public show() {
 		this.visible = true;
